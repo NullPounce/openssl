@@ -8,9 +8,9 @@
 # https://www.openssl.org/source/license.html
 
 """Fuzzing helper, creates and uses corpus/crash directories.
-
 fuzzer.py <fuzzer> <extra fuzzer arguments>
 """
+
 import os
 import subprocess
 import sys
@@ -42,9 +42,11 @@ def main():
     _create(FUZZER + "-crash")
     _add(FUZZER + "-seed")
 
-    cmd = [os.path.abspath(os.path.join(THIS_DIR, FUZZER))] + sys.argv[2:] + ["-artifact_prefix=" + corpora[1] + "/"] + corpora
-    subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    cmd = ([os.path.abspath(os.path.join(THIS_DIR, FUZZER))]  + sys.argv[2:]
+           + ["-artifact_prefix=" + corpora[1] + "/"] + corpora)
+    sanitized_cmd = [arg for arg in cmd if arg and arg != '']
+    print(" ".join(sanitized_cmd))
+    subprocess.call(sanitized_cmd)
 
 if __name__ == "__main__":
     main()
-
