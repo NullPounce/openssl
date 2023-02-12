@@ -14,7 +14,6 @@ fuzzer.py <fuzzer> <extra fuzzer arguments>
 import os
 import subprocess
 import sys
-import re
 
 FUZZER = sys.argv[1]
 
@@ -43,15 +42,9 @@ def main():
     _create(FUZZER + "-crash")
     _add(FUZZER + "-seed")
 
-    # Validate the input
-    if not re.match(r"^[\w\-]+$", FUZZER):
-        print("Invalid fuzzer name")
-        sys.exit(1)
-
-    cmd = ([os.path.abspath(os.path.join(THIS_DIR, FUZZER))] + sys.argv[2:]
-           + ["-artifact_prefix=" + corpora[1] + "/"] + corpora)
-    print(" ".join(cmd))
-    subprocess.call(cmd, shell=False)
+    cmd = [os.path.abspath(os.path.join(THIS_DIR, FUZZER))] + sys.argv[2:] + ["-artifact_prefix=" + corpora[1] + "/"] + corpora
+    subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 if __name__ == "__main__":
     main()
+
