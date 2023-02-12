@@ -1,4 +1,3 @@
-#!/usr/bin/python
 #
 # Copyright 2016-2018 The OpenSSL Project Authors. All Rights Reserved.
 #
@@ -11,10 +10,10 @@
 
 fuzzer.py <fuzzer> <extra fuzzer arguments>
 """
-
 import os
 import subprocess
 import sys
+import shlex
 
 FUZZER = sys.argv[1]
 
@@ -44,7 +43,8 @@ def main():
     _add(FUZZER + "-seed")
 
     cmd = ([os.path.abspath(os.path.join(THIS_DIR, FUZZER))]  + sys.argv[2:]
-           + ["-artifact_prefix=" + corpora[1] + "/"] + corpora)
+           + ["-artifact_prefix=" + shlex.quote(corpora[1] + "/")]
+           + [shlex.quote(c) for c in corpora])
     print(" ".join(cmd))
     subprocess.call(cmd)
 
