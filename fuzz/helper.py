@@ -42,11 +42,8 @@ def main():
     _create(FUZZER + "-crash")
     _add(FUZZER + "-seed")
 
-    cmd = ([os.path.abspath(os.path.join(THIS_DIR, FUZZER))]  + sys.argv[2:]
-           + ["-artifact_prefix=" + corpora[1] + "/"] + corpora)
-    sanitized_cmd = [arg for arg in cmd if arg and arg != '']
-    print(" ".join(sanitized_cmd))
-    subprocess.call(sanitized_cmd)
+    cmd = [os.path.abspath(os.path.join(THIS_DIR, FUZZER))] + sys.argv[2:] + ["-artifact_prefix=" + corpora[1] + "/"] + corpora
+    subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 if __name__ == "__main__":
     main()
