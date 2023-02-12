@@ -1,13 +1,22 @@
+#!/usr/bin/python
+#
+# Copyright 2016-2018 The OpenSSL Project Authors. All Rights Reserved.
+#
+# Licensed under the Apache License 2.0 (the "License").  You may not use
+# this file except in compliance with the License.  You can obtain a copy
+# in the file LICENSE in the source distribution or at
+# https://www.openssl.org/source/license.html
+
+"""Fuzzing helper, creates and uses corpus/crash directories.
+
+fuzzer.py <fuzzer> <extra fuzzer arguments>
+"""
 import os
 import subprocess
 import sys
-
-ALLOWED_FUZZERS = ['fuzzer1', 'fuzzer2', 'fuzzer3']
+import re
 
 FUZZER = sys.argv[1]
-if FUZZER not in ALLOWED_FUZZERS:
-    print(f"Error: Fuzzer {FUZZER} is not allowed. Allowed fuzzers are: {ALLOWED_FUZZERS}")
-    sys.exit(1)
 
 THIS_DIR = os.path.abspath(os.path.dirname(__file__))
 CORPORA_DIR = os.path.abspath(os.path.join(THIS_DIR, "corpora"))
@@ -34,7 +43,12 @@ def main():
     _create(FUZZER + "-crash")
     _add(FUZZER + "-seed")
 
-    cmd = ([os.path.abspath(os.path.join(THIS_DIR, FUZZER))]  + sys.argv[2:]
+    # Validate the input
+    if not re.match(r"^[\w\-]+$", FUZZER):
+        print("Invalid fuzzer name")
+        sys.exit(1)
+
+    cmd = ([os.path.abspath(os.path.join(THIS_DIR, FUZZER))] + sys.argv[2:]
            + ["-artifact_prefix=" + corpora[1] + "/"] + corpora)
     print(" ".join(cmd))
     subprocess.call(cmd, shell=False)
