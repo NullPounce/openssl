@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #
 # Copyright 2016-2018 The OpenSSL Project Authors. All Rights Reserved.
 #
@@ -10,10 +11,10 @@
 
 fuzzer.py <fuzzer> <extra fuzzer arguments>
 """
+
 import os
 import subprocess
 import sys
-import shlex
 
 FUZZER = sys.argv[1]
 
@@ -42,11 +43,12 @@ def main():
     _create(FUZZER + "-crash")
     _add(FUZZER + "-seed")
 
-    cmd = ([os.path.abspath(os.path.join(THIS_DIR, FUZZER))]  + sys.argv[2:]
-           + ["-artifact_prefix=" + shlex.quote(corpora[1] + "/")]
-           + [shlex.quote(c) for c in corpora])
+    # Use the shlex library to safely split the command line arguments
+    import shlex
+    cmd = ([os.path.abspath(os.path.join(THIS_DIR, FUZZER))]  + shlex.split(sys.argv[2:])
+           + ["-artifact_prefix=" + corpora[1] + "/"] + corpora)
     print(" ".join(cmd))
-    subprocess.call(cmd)
+    subprocess.call(cmd, shell=False)
 
 if __name__ == "__main__":
     main()
